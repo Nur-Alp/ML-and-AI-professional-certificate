@@ -40,3 +40,9 @@ updated proposal and convergence plot, no code changes needed.
 See [docs/DATASHEET.md](docs/DATASHEET.md) for details on the data, and
 [docs/MODEL_CARD.md](docs/MODEL_CARD.md) for the model's assumptions and
 limitations.
+
+## Course reference material
+
+`course-reference/` holds supplementary, unrelated course materials (kept
+separate from the capstone project itself); see
+[course-reference/README.md](course-reference/README.md) for details.
