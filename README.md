@@ -98,9 +98,11 @@ updated proposal and convergence plot, no code changes needed.
 
 ## Further documentation
 
-See [docs/DATASHEET.md](docs/DATASHEET.md) for details on the data, and
+See [docs/DATASHEET.md](docs/DATASHEET.md) for details on the data,
 [docs/MODEL_CARD.md](docs/MODEL_CARD.md) for the model's assumptions and
-limitations.
+limitations, and [docs/METHODOLOGY.md](docs/METHODOLOGY.md) for the technical
+justification behind the approach, relevant prior research, and library
+choices.
 
 ## Course reference material
 
