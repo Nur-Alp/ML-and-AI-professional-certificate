@@ -68,6 +68,11 @@ back:
   function depending on dimensionality). Several functions (2, 3, 4, 6) still
   carry wide predicted uncertainty relative to their predicted mean, so
   current proposals lean exploratory rather than confidently exploitative.
+- **Round 5 results:** Function 5 jumped again, from 4039.6 to 8297.1, more
+  than doubling and easily the largest single-round gain so far. Functions 7
+  and 8 both reached new bests (1.74 and 9.96 respectively). Function 1
+  remains essentially flat at zero, consistent with its documented sparse,
+  spike-only signal.
 
 ## Repository structure
 
