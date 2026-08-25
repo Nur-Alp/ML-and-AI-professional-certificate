@@ -73,6 +73,11 @@ back:
   and 8 both reached new bests (1.74 and 9.96 respectively). Function 1
   remains essentially flat at zero, consistent with its documented sparse,
   spike-only signal.
+- **Round 6 results:** a mixed round. Functions 4 and 5 both reached new
+  bests (0.619 and 8662.4 respectively, Function 5's fourth consecutive
+  improvement), while Functions 6, 7 and 8 came in below their current best,
+  expected behaviour under UCB, which deliberately spends some queries on
+  exploration rather than pure exploitation.
 
 ## Repository structure
 
