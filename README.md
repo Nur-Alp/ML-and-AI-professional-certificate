@@ -86,6 +86,15 @@ back:
   Functions 5, 6 and 8 came in below their current bests, another
   exploration-heavy round under UCB rather than a regression in the
   underlying model.
+- **Round 9 results:** Functions 6 and 7 both reached new bests (-0.176 and
+  2.501 respectively). A deep diagnostic pass ahead of round 10 caught a real
+  bug: the raw UCB proposal for Function 5 was an exact duplicate of the
+  point already queried in rounds 6 and 7 (distance to nearest observation =
+  0.0000), which would have wasted a query on a confirmed-deterministic
+  function. Fixed by excluding near-duplicate candidates
+  (`propose_next_point` now filters out any candidate within 0.02 of an
+  already-observed point) before maximising UCB, this also corrected a
+  near-duplicate proposal for Function 2.
 
 ## Repository structure
 
