@@ -78,6 +78,10 @@ back:
   improvement), while Functions 6, 7 and 8 came in below their current best,
   expected behaviour under UCB, which deliberately spends some queries on
   exploration rather than pure exploitation.
+- **Round 7 results:** Functions 6 and 7 both reached new bests (-0.397 and
+  2.235 respectively). Function 5 returned the exact same value as round 6
+  (8662.4), since both rounds proposed the identical point, confirming the
+  function is deterministic (no observation noise) at that location.
 
 ## Repository structure
 
