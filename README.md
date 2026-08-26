@@ -82,6 +82,10 @@ back:
   2.235 respectively). Function 5 returned the exact same value as round 6
   (8662.4), since both rounds proposed the identical point, confirming the
   function is deterministic (no observation noise) at that location.
+- **Round 8 results:** Function 7 reached another new best (2.273), while
+  Functions 5, 6 and 8 came in below their current bests, another
+  exploration-heavy round under UCB rather than a regression in the
+  underlying model.
 
 ## Repository structure
 
