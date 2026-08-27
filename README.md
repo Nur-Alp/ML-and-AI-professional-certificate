@@ -95,6 +95,11 @@ back:
   (`propose_next_point` now filters out any candidate within 0.02 of an
   already-observed point) before maximising UCB, this also corrected a
   near-duplicate proposal for Function 2.
+- **Round 10 results:** Functions 2 and 8 reached new bests (0.660 and
+  9.971 respectively). Function 5 came in second-best (8266.8, below the
+  8662.4 tied best from rounds 6-7), confirming the true optimum along that
+  dimension sits slightly off the exact search boundary rather than exactly
+  on it.
 
 ## Repository structure
 
