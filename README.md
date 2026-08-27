@@ -100,6 +100,10 @@ back:
   8662.4 tied best from rounds 6-7), confirming the true optimum along that
   dimension sits slightly off the exact search boundary rather than exactly
   on it.
+- **Round 11 results:** a strong round. Function 3 finally beat the
+  instructor-provided initial data for the first time in eleven rounds
+  (-0.0297, versus -0.0348 that had stood since before round 1). Functions 4
+  and 8 also reached new bests (0.6506 and 9.9761 respectively).
 
 ## Repository structure
 
