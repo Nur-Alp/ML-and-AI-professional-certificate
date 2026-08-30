@@ -104,6 +104,10 @@ back:
   instructor-provided initial data for the first time in eleven rounds
   (-0.0297, versus -0.0348 that had stood since before round 1). Functions 4
   and 8 also reached new bests (0.6506 and 9.9761 respectively).
+- **Round 12 results:** Functions 4, 7 and 8 all reached new bests (0.6556,
+  2.6747 and 9.9938 respectively), the strongest simultaneous-improvement
+  round of the whole project. Round 13 is the final round of query
+  submissions for the capstone.
 
 ## Repository structure
 
