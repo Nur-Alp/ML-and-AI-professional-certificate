@@ -108,6 +108,29 @@ back:
   2.6747 and 9.9938 respectively), the strongest simultaneous-improvement
   round of the whole project. Round 13 is the final round of query
   submissions for the capstone.
+- **Round 13 (final) results:** Function 7 improved once more, a fitting
+  final-round win (2.7314, up from 2.6747). This was the last submitted
+  round, the optimisation phase is now complete.
+
+### Final results summary (13 rounds of real queries)
+
+| Function | Best value | Achieved | Final (round 13) value |
+|---|---|---|---|
+| 1 | 0.000000 | round 6 | 0.000000 |
+| 2 | 0.659839 | round 10 | 0.643541 |
+| 3 | -0.029742 | round 11 | -0.140559 |
+| 4 | 0.655593 | round 12 | 0.481605 |
+| 5 | 8662.405001 | round 6 | 7924.176148 |
+| 6 | -0.176172 | round 9 | -0.220352 |
+| 7 | 2.731447 | round 13 (final) | 2.731447 |
+| 8 | 9.993834 | round 12 | 9.986582 |
+
+Six of eight functions improved substantially over their original starting
+point (Functions 2, 4, 5, 6, 7, 8); Function 3 improved only after ten
+rounds of no progress, finally beating the instructor-provided initial
+data in round 11; Function 1 never developed a usable signal above noise
+across the entire project, consistent with its documented sparse,
+spike-only behaviour.
 
 ## Repository structure
 
