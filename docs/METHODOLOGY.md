@@ -29,11 +29,19 @@ whereas this project gets one query per function per week. A fixed Matern
 kernel with a single UCB acquisition is a deliberate, budget-appropriate
 simplification of the same underlying idea, not an oversight.
 
-As more rounds accumulate, HEBO's non-linear warping becomes increasingly
-worth revisiting, particularly for Function 5, which has shown large,
-non-stationary jumps in observed value across rounds (2271.5 to 1261.8 to
-4956.2 to 8297.1 across rounds 1-5), exactly the kind of behaviour HEBO's
-approach was designed to handle better than a plain GP.
+Across the full, completed project, Function 5 showed exactly the kind of
+large, non-stationary behaviour HEBO's warping was designed for: its best
+value moved 2271.5, 1261.8, 4956.2, 8297.1, 8662.4, 8662.4 (confirmed
+deterministic repeat), 6794.9, 6543.9, 8266.8, 8282.8, 8281.2, 7924.2 across
+rounds 1-13, more than tripling from its starting point before settling
+into a plateau. That non-monotonic, threshold-then-plateau shape is
+precisely what a plain GP with a fixed kernel struggles to represent
+cleanly compared to HEBO's non-linear warping. In hindsight, HEBO's
+approach was never adopted in practice, the fixed Matern kernel plus UCB
+was sufficient to capture the project's biggest win (Function 5) and its
+final-round win (Function 7, still improving as of round 13), so the
+budget-appropriate simplification held up across the whole project, not
+just its early rounds.
 
 ## Libraries and alternatives
 
@@ -42,28 +50,34 @@ The core stack is scikit-learn (`GaussianProcessRegressor` with `Matern`,
 diagnostics), and Matplotlib. Deliberately not PyTorch, TensorFlow, or
 GPU-oriented GP libraries like GPyTorch or BoTorch: those exist specifically
 to scale Gaussian Processes to thousands or millions of points via
-approximate inference, but every function here has at most a few dozen
-observed points (15 to 45 depending on dimensionality as of round 5), well
-within the range where scikit-learn's exact, CPU-based GP implementation is
-both sufficient and simpler to reason about. Choosing a deep-learning
-framework here would trade away simplicity and determinism for scalability
-this project doesn't need.
+approximate inference, but every function here finished the project with at
+most 53 observed points (23 to 53 depending on dimensionality, after all 13
+rounds), well within the range where scikit-learn's exact, CPU-based GP
+implementation was both sufficient and simpler to reason about throughout.
+Choosing a deep-learning framework here would have traded away simplicity
+and determinism for scalability this project never needed, even at its
+final data scale.
 
 ## Documentation plan
 
 These justifications live here, linked from the README, alongside
 [DATASHEET.md](DATASHEET.md) (data provenance and limitations) and
 [MODEL_CARD.md](MODEL_CARD.md) (model behaviour and caveats). The README's
-own "technical approach" section is kept as a living, round-by-round log, so
-a reader gets the narrative there and the deeper justification here.
+own "Technical approach" section is kept as the full, final round-by-round
+log (rounds 1-13), so a reader gets the narrative there and the deeper
+justification here.
 
-## Looking ahead
+## What would be worth trying with more query budget
 
-Beyond HEBO's warping techniques, worth consulting as the project continues:
-constant-liar and local-penalization strategies for batch/parallel Bayesian
-optimisation (not currently relevant at one query per function per week, but
-useful if the query cadence ever changes), and a proper continuous
-optimiser (e.g. L-BFGS-B with multiple restarts) for maximising the
-acquisition function in the higher-dimensional functions (7 and 8), where the
-current random-candidate-pool search is more likely to miss narrow optima in
-the acquisition surface.
+The optimisation phase for this capstone is complete (13 of 13 rounds
+submitted), so these were not implemented, but would be the natural next
+steps for a longer-running version of this project: constant-liar and
+local-penalization strategies for batch/parallel Bayesian optimisation (not
+relevant at one query per function per week, but useful at a higher query
+cadence), a proper continuous optimiser (e.g. L-BFGS-B with multiple
+restarts) for maximising the acquisition function in the higher-dimensional
+functions (7 and 8), where the random-candidate-pool search used throughout
+this project is more likely to miss narrow optima, and a function-specific
+or annealed `kappa` in place of the fixed value of 2.0 used across all
+eight functions for all 13 rounds, the single most consistently flagged
+limitation across this project's own reflections.

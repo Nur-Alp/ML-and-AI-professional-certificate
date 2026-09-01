@@ -95,9 +95,15 @@ notebooks/bbo_capstone.ipynb   Main notebook: fits a GP surrogate per function,
                                 proposes the next query, and plots progress.
 data/initial_data/             Per-function input/output arrays, final state
                                 after 13 rounds of real query results.
+data/convergence_plots.png     Running-best-value curve for all 8 functions.
+data/round11_clusters.png      Per-function cluster visualisation (component 22.1).
+data/function5_clear_clusters.png  Zoomed-in example of well-separated clusters.
+data/function3_no_separation.png   Zoomed-in example of no cluster separation.
 docs/DATASHEET.md              Data documentation (component 25.3 template).
 docs/MODEL_CARD.md             Model documentation (component 25.3 template).
 docs/METHODOLOGY.md            Technical justification, relevant research, library choices.
+course-reference/              Unrelated supplementary course material, kept
+                                separate from the capstone project itself.
 ```
 
 ## How to run
