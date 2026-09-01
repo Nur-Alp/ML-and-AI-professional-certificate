@@ -1,60 +1,118 @@
 # Bayesian Black-Box Optimisation (BBO) Capstone
 
-## Section 1: project overview
 
-This project tackles eight hidden mathematical functions, each standing in for a
-real-world optimisation problem, locating a radiation source, tuning a noisy
-model, minimising adverse drug reactions, where only a handful of measurements
-can be taken before committing to the best input. Rather than guessing
-randomly, the project uses Bayesian optimisation: a statistical model learns
-from every past measurement to predict where the best result is likely to be,
-and each new measurement is chosen to balance testing promising areas against
-exploring uncertain ones.
+## NON-TECHNICAL EXPLANATION OF YOUR PROJECT
 
-This mirrors a genuinely common industry constraint, expensive-to-evaluate
-systems (physical experiments, long-running simulations, A/B tests) where
-brute-force grid search isn't an option, which is directly relevant to future
-ML engineering work involving hyperparameter tuning or experiment design under
-a tight query budget.
+This project tackles eight hidden mathematical functions, each standing in
+for a real-world problem like finding a radiation source or tuning a
+chemical process, where only one test is allowed per function each week.
+Rather than guessing randomly, a statistical model learns from every past
+result to predict where the best answer is likely to be, and each new
+guess is chosen to balance testing promising areas against exploring the
+unknown. Over 13 weeks of real feedback, six of the eight functions
+improved substantially, in one case more than tripling, while a
+mid-project check caught and fixed a bug that would have wasted a test.
 
-## Section 2: inputs and outputs
 
-Each of the eight functions takes an input vector with dimensionality specific
-to that function, ranging from 2 dimensions (Functions 1-2) up to 8 dimensions
-(Function 8). Every input value must lie in `[0.000000, 0.999999]` and is
-submitted through the capstone portal as a hyphen-separated string with six
-decimal places, for example `0.812353-0.531722` for a 2D function. The portal
-returns a single scalar output value, the (possibly negated, to keep the task
-a maximisation problem) result of evaluating the true hidden function at that
-point.
+## DATA
 
-## Section 3: challenge objectives
+Eight independent synthetic "black-box" functions, dimensionality 2D to
+8D, each provided by the course instructors with 10-40 initial points and
+growing by one new (input, output) pair per function per week across 13
+rounds of real portal feedback (final sizes: 23-53 points per function).
+Every input lies in `[0.000000, 0.999999]`; several real-world analogies
+are naturally minimisation problems and their outputs were pre-negated so
+higher is always better within this project. Full provenance, structure
+and per-function detail: [docs/DATASHEET.md](docs/DATASHEET.md). Raw data
+lives in `data/initial_data/function_{1-8}/` as NumPy arrays, not hosted
+elsewhere, it's small enough (a few KB per function) to keep directly in
+the repository.
 
-All eight functions are framed as maximisation problems. The core constraint
-is query budget, one new measurement per function per week, so the strategy
-has to extract maximum information from every single query rather than
-exploring broadly and cheaply. There's also response delay to account for,
-results can take time to come back from the portal, and the function
-structure itself is entirely unknown beyond a rough real-world analogy and
-dimensionality, so no assumptions about smoothness or unimodality can be taken
-for granted beyond what the data itself reveals.
 
-## Section 4: technical approach
+## MODEL
 
-The approach uses a Gaussian Process (GP) surrogate model,
-`sklearn.gaussian_process.GaussianProcessRegressor` with a Matern kernel plus
-a white-noise term, one independently fit per function. A GP was chosen over
-a simpler regression or an SVM because it naturally provides a calibrated
-uncertainty estimate at every candidate point, not just a prediction, which is
-exactly what's needed to balance exploration and exploitation. That balance is
-handled by an Upper Confidence Bound acquisition function
-(`mean + kappa * std`, kappa=2.0), which explicitly rewards both high
-predicted value and high uncertainty, so a candidate can be proposed either
-because the model thinks it's good or because the model doesn't know enough
-about that region yet.
+A Gaussian Process (GP) regression surrogate, one independently fit per
+function, paired with an Upper Confidence Bound (UCB) acquisition
+function, implemented from scratch with scikit-learn rather than a
+dedicated Bayesian optimisation library. A GP was chosen over a simpler
+regression or an SVM because it gives a calibrated uncertainty estimate at
+every candidate point, not just a prediction, which UCB needs directly to
+balance exploring uncertain regions against exploiting known-good ones.
+scikit-learn's exact, CPU-based implementation was chosen over GPU-oriented
+alternatives (GPyTorch, BoTorch) because every function has at most a few
+dozen points, well within the range where the simpler, more transparent
+implementation is sufficient. Full model details, relevant research (the
+NeurIPS 2020 winning HEBO approach) and trade-offs:
+[docs/MODEL_CARD.md](docs/MODEL_CARD.md) and
+[docs/METHODOLOGY.md](docs/METHODOLOGY.md).
 
-This is a living record, updated as the approach evolves and more rounds come
-back:
+
+## HYPERPARAMETER OPTIMISATION
+
+The GP's own kernel hyperparameters (per-dimension length-scale, noise
+level) are optimised automatically every time a model is refit, via
+gradient-based restarts (`n_restarts_optimizer=5`) on the marginal
+likelihood, no manual search involved. The acquisition function's
+exploration weight (`kappa = 2.0`) and the candidate-pool sizes (20,000
+random plus 2,000 local) were chosen manually and held fixed across all
+eight functions and all 13 rounds, a deliberate simplification given the
+small data scale and lack of a validation loop to search against; this is
+documented as a known limitation, a function-specific or annealed kappa
+would likely be more efficient given how differently the eight functions
+behaved.
+
+
+## RESULTS
+
+Final best value achieved per function across 13 rounds of real feedback
+(full per-round narrative in the "Technical approach" log below):
+
+| Function | Best value | Achieved | Improvement from round 1 |
+|---|---|---|---|
+| 1 | 0.000000 | round 6 | none (stayed at noise floor) |
+| 2 | 0.659839 | round 10 | +294% |
+| 3 | -0.029742 | round 11 | broke a 10-round stall |
+| 4 | 0.655593 | round 12 | improved from negative |
+| 5 | 8662.405001 | round 6 | +281% |
+| 6 | -0.176172 | round 9 | improved from -0.887 |
+| 7 | 2.731447 | round 13 (final) | +132% |
+| 8 | 9.993834 | round 12 | +1.4% (near-ceiling from round 1) |
+
+Six of eight functions improved substantially over their starting point.
+Function 3 stayed stuck at the instructor-provided initial data's value for
+ten straight rounds before finally breaking through in round 11. Function 1
+never developed usable signal above noise across the entire project,
+consistent with its documented sparse, spike-only behaviour. Full
+convergence curves for all eight functions:
+
+![Screenshot](data/convergence_plots.png)
+
+
+## Repository structure
+
+```
+notebooks/bbo_capstone.ipynb   Main notebook: fits a GP surrogate per function,
+                                proposes the next query, and plots progress.
+data/initial_data/             Per-function input/output arrays, final state
+                                after 13 rounds of real query results.
+docs/DATASHEET.md              Data documentation (component 25.3 template).
+docs/MODEL_CARD.md             Model documentation (component 25.3 template).
+docs/METHODOLOGY.md            Technical justification, relevant research, library choices.
+```
+
+## How to run
+
+```
+pip install numpy scikit-learn scipy matplotlib jupyter
+jupyter nbconvert --to notebook --execute --inplace notebooks/bbo_capstone.ipynb
+```
+
+The notebook reloads whatever data currently exists under `data/initial_data/`,
+so re-running it reproduces the final results and convergence plot with no
+code changes needed. The optimisation phase is complete (13 of 13 rounds
+submitted), so no further query proposals are expected from a fresh run.
+
+## Technical approach: full round-by-round log
 
 - **Rounds 1-2:** established the baseline GP+UCB loop. Function 5 already
   showed the exploration budget paying off, dipping from 2271.5 to 1261.8
@@ -111,56 +169,6 @@ back:
 - **Round 13 (final) results:** Function 7 improved once more, a fitting
   final-round win (2.7314, up from 2.6747). This was the last submitted
   round, the optimisation phase is now complete.
-
-### Final results summary (13 rounds of real queries)
-
-| Function | Best value | Achieved | Final (round 13) value |
-|---|---|---|---|
-| 1 | 0.000000 | round 6 | 0.000000 |
-| 2 | 0.659839 | round 10 | 0.643541 |
-| 3 | -0.029742 | round 11 | -0.140559 |
-| 4 | 0.655593 | round 12 | 0.481605 |
-| 5 | 8662.405001 | round 6 | 7924.176148 |
-| 6 | -0.176172 | round 9 | -0.220352 |
-| 7 | 2.731447 | round 13 (final) | 2.731447 |
-| 8 | 9.993834 | round 12 | 9.986582 |
-
-Six of eight functions improved substantially over their original starting
-point (Functions 2, 4, 5, 6, 7, 8); Function 3 improved only after ten
-rounds of no progress, finally beating the instructor-provided initial
-data in round 11; Function 1 never developed a usable signal above noise
-across the entire project, consistent with its documented sparse,
-spike-only behaviour.
-
-## Repository structure
-
-```
-notebooks/bbo_capstone.ipynb   Main notebook: fits a GP surrogate per function,
-                                proposes the next query, and plots progress.
-data/initial_data/             Per-function input/output arrays, updated as
-                                each week's new query result comes back.
-docs/DATASHEET.md              Description of the data used, its origin and limitations.
-docs/MODEL_CARD.md             Model behaviour, assumptions and limitations.
-```
-
-## How to run
-
-```
-pip install numpy scikit-learn scipy matplotlib jupyter
-jupyter nbconvert --to notebook --execute --inplace notebooks/bbo_capstone.ipynb
-```
-
-The notebook reloads whatever data currently exists under `data/initial_data/`,
-so re-running it after appending a new week's result automatically produces an
-updated proposal and convergence plot, no code changes needed.
-
-## Further documentation
-
-See [docs/DATASHEET.md](docs/DATASHEET.md) for details on the data,
-[docs/MODEL_CARD.md](docs/MODEL_CARD.md) for the model's assumptions and
-limitations, and [docs/METHODOLOGY.md](docs/METHODOLOGY.md) for the technical
-justification behind the approach, relevant prior research, and library
-choices.
 
 ## Course reference material
 
